@@ -65,6 +65,14 @@ DHT.prototype.sendKRPC = function(msg, rinfo) {
         //do nothing
     }
 };
+DHT.prototype.playDead = function(rinfo) {
+    var msg = {
+        t: entropy(TID_LENGTH), 
+        y: "e", 
+        e: [202, "Server Error"]
+    };
+    this.sendKRPC(msg, rinfo);
+};
 DHT.prototype.processFindNodeReceived = function(nodes) {
     var nodes = decodeNodes(nodes);
     var self = this;
@@ -78,17 +86,19 @@ DHT.prototype.processFindNodeReceived = function(nodes) {
         }
     });
 };
+DHT.prototype.processFindNode = function(msg, rinfo) {
+    var target = msg.a.target;
+    if (target) {
+        this.master.log(target);
+    }
+    this.playDead(rinfo);
+};
 DHT.prototype.processGetPeers = function(msg, rinfo) {
     var infohash = msg.a.info_hash;
     if (infohash) {
-        this.master.log(infohash.toString("hex"));
+        this.master.log(infohash);
     }
-    var msg = {
-        t: entropy(TID_LENGTH), 
-        y: "e", 
-        e: [202, "Server Error"]
-    };
-    this.sendKRPC(msg, rinfo);
+    this.playDead(rinfo);
 };
 DHT.prototype.sendFindNode = function(rinfo, nid) {
     if (nid === undefined) {
@@ -124,7 +134,7 @@ DHT.prototype.dataReceived = function(msg, rinfo) {
             this.processGetPeers(msg, rinfo);
         }
         else if (msg.y == "q" && (msg.q == "find_node")) {
-            //this.processFindNode(msg, rinfo);
+            this.processFindNode(msg, rinfo);
         }
     }
     catch (ex) {
@@ -160,7 +170,7 @@ DHT.prototype.start = function() {
 
 function Master() {}
 Master.prototype.log = function(infohash) {
-    console.log(infohash);
+    console.log(infohash.toString("hex"));
 };
 
 function KTable() {
