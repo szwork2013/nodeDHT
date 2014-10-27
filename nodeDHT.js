@@ -141,7 +141,6 @@ DHT.prototype.start = function() {
     this.udp.on("error", function(err) {
         //do nothing
     });
-    var self = this;
 
     (function timer1() {
         self.joinDHT();
