@@ -53,14 +53,15 @@ function DHT(master, bindIP, bindPort) {
     this.bindIP = bindIP;
     this.bindPort = bindPort;
     this.ktable = new KTable();
-    this.udp = dgram.createSocket("udp4");    
+    this.udp = dgram.createSocket("udp4");
     this.udp.bind(this.bindPort, this.bindIP);
 }
 DHT.prototype.sendKRPC = function(msg, rinfo) {
     try {
         var buf = bencode.encode(msg);
         this.udp.send(buf, 0, buf.length, rinfo.port, rinfo.address);
-    } catch (ex) {
+    }
+    catch (ex) {
         //do nothing
     }
 };
@@ -70,7 +71,9 @@ DHT.prototype.processFindNodeReceived = function(nodes) {
     nodes.forEach(function(node) {
         if (node.address == self.bindIP && node.port == self.bindPort
             || node.nid == self.ktable.nid) {
-        } else {
+            //do nothing
+        }
+        else {
             self.ktable.push(new KNode(node.address, node.port, node.nid));
         }
     });
@@ -83,14 +86,15 @@ DHT.prototype.processGetPeers = function(msg, rinfo) {
     var msg = {
         t: entropy(TID_LENGTH), 
         y: "e", 
-        e: [203, "Server Error"]
+        e: [202, "Server Error"]
     };
     this.sendKRPC(msg, rinfo);
 };
 DHT.prototype.sendFindNode = function(rinfo, nid) {
     if (nid === undefined) {
         var nid = randomID();
-    } else {
+    }
+    else {
         var nid = getNeighbor(nid);
     }
     var msg = {
@@ -116,13 +120,14 @@ DHT.prototype.dataReceived = function(msg, rinfo) {
         if (msg.y == "r" && msg.r.nodes) {
             this.processFindNodeReceived(msg.r.nodes);
         }
-        else if(msg.y == "q" && (msg.q == "get_peers")) {
+        else if (msg.y == "q" && (msg.q == "get_peers")) {
             this.processGetPeers(msg, rinfo);
         }
-        else if(msg.y == "q" && (msg.q == "find_node")) {
+        else if (msg.y == "q" && (msg.q == "find_node")) {
             //this.processFindNode(msg, rinfo);
         }
-    } catch (ex) {
+    }
+    catch (ex) {
         //do nothing
     }
 };
