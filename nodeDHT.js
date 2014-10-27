@@ -1,8 +1,5 @@
 var crypto = require("crypto");
 var dgram = require("dgram");
-var util = require("util");
-var events = require("events");
-var emitter = new events.EventEmitter();
 
 var bencode = require("bencode");
 
