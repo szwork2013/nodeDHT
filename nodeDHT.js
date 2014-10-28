@@ -1,5 +1,6 @@
 var crypto = require("crypto");
 var dgram = require("dgram");
+var timers = require("timers");
 
 var bencode = require("bencode");
 
@@ -156,16 +157,8 @@ DHT.prototype.start = function() {
     this.udp.on("error", function(err) {
         //do nothing
     });
-
-    (function timer1() {
-        self.joinDHT();
-        setTimeout(timer1, 10000);
-    })();
-
-    (function timer2() {
-        self.wander();
-        setTimeout(timer2, 1000);
-    })();
+    timers.setInterval(function() {self.joinDHT()}, 10000);
+    timers.setInterval(function() {self.wander()}, 1000);
 };
 
 function Master() {}
@@ -190,4 +183,4 @@ function KNode(address, port, nid) {
     this.nid = nid;
 }
 
-new DHT(new Master(), "0.0.0.0", 2881).start();
+new DHT(new Master(), "0.0.0.0", 6881).start();
