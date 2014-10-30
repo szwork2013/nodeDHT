@@ -102,11 +102,11 @@ DHT.prototype.processGetPeers = function(msg, rinfo) {
     this.playDead(rinfo);
 };
 DHT.prototype.sendFindNode = function(rinfo, nid) {
-    if (nid === undefined) {
-        var nid = randomID();
+    if (typeof nid != "undefined") {
+        var nid = getNeighbor(nid);
     }
     else {
-        var nid = getNeighbor(nid);
+        var nid = randomID();
     }
     var msg = {
         t: entropy(TID_LENGTH),
